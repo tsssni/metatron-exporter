@@ -1,6 +1,10 @@
-from metatron_exporter import metatron, tungsten
-import argparse
+from metatron_exporter import metatron
+from metatron_exporter.metatron.compo import *
+from dataclasses import asdict
 import os
+import argparse
+import json
+import importlib
 
 def path_norm(path: str):
     if (path.endswith(os.sep)):
@@ -18,9 +22,9 @@ def main():
     metatron.scene_dir = path_norm(args.scene);
     metatron.output_dir = path_norm(args.output);
 
-    if (args.renderer == 'tungsten'):
-        scene = tungsten.export()
-        print(scene)
+    renderer = importlib.import_module(f'metatron_exporter.{args.renderer}')
+    scene = renderer.export()
+    print(json.dumps([asdict(item) for item in scene], indent=4))
 
 
 if __name__ == '__main__':

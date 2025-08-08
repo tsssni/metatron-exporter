@@ -1,0 +1,5 @@
+vec2 = tuple[float, float]
+ivec2 = tuple[int, int]
+vec3 = tuple[float, float, float]
+vec4 = tuple[float, float, float, float]
+mat4 = tuple[vec4, vec4, vec4, vec4]

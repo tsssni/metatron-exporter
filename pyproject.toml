@@ -7,5 +7,10 @@ requires-python = ">=3.11"
 dependencies = []
 
 [tool.pyright]
-reportAny = "none"
-reportUnusedCallResult = "none"
+autoImportCompletions = false
+reportAny = false
+reportMissingParameterType = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportUnusedCallResult = false

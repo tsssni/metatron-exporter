@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from ..linalg import *
 
 @dataclass
 class Constant_Spectrum_Texture:
@@ -13,7 +14,7 @@ class Image_Spectrum_Texture:
 
 @dataclass
 class Constant_Vector_Texture:
-    x: list[float]
+    x: vec3
     constant_vector: int = 0
 
 @dataclass

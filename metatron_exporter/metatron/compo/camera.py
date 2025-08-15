@@ -47,7 +47,7 @@ Filter = Box_Filter | Gaussian_Filter | Lanczos_Filter
 @dataclass
 class Camera:
     film_size: vec2
-    image_size: ivec2
+    image_size: vec2
     spp: int
     depth: int
     lens: Lens

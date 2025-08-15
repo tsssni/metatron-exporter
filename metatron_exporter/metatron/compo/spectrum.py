@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from ..linalg import *
 
 @dataclass
 class Constant_Spectrum:
@@ -7,7 +8,7 @@ class Constant_Spectrum:
 
 @dataclass
 class Rgb_Spectrum:
-    c: list[float]
+    c: vec3
     type: str
     color_space: str
     rgb: int = 0

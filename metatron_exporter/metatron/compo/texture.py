@@ -14,7 +14,7 @@ class Image_Spectrum_Texture:
 
 @dataclass
 class Constant_Vector_Texture:
-    x: vec3
+    x: vec4
     constant_vector: int = 0
 
 @dataclass

@@ -66,5 +66,5 @@ def import_medium(json):
     transforms.append(compo.json(
         entity='/hierarchy/medium/' + json['name'],
         type = 'transform',
-        serialized=compo.Local_Transform()
+        serialized=compo.Local_Transform(),
     ))

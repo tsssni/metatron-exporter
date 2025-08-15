@@ -1,9 +1,11 @@
-from .transform import transforms
-from .spectrum import spectra
-from .medium import import_medium, media, medium_instances
+from .transform import *
+from .spectrum import *
+from .medium import *
+from .material import *
 from .. import metatron
 from ..metatron import compo
 import json
+
 
 def export() -> list[compo.json]:
     with open(metatron.scene_dir + 'scene.json', 'r') as f:
@@ -25,4 +27,9 @@ def export() -> list[compo.json]:
     ))
     for m in scene['media']:
         import_medium(m)
-    return transforms + spectra + media + medium_instances
+    for b in scene['bsdfs']:
+        import_material(b)
+    return []\
+    + transforms + spectra\
+    + media + medium_instances\
+    + textures + materials

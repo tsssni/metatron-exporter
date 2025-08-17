@@ -8,12 +8,9 @@ class Local_Transform:
     rotation: vec4 = (0.0, 0.0, 0.0, 1.0)
 
 @dataclass
-class Matrix_Transform:
-    matrix: mat4 = (
-        (1.0, 0.0, 0.0, 0.0),
-        (0.0, 1.0, 0.0, 0.0),
-        (0.0, 0.0, 1.0, 0.0),
-        (0.0, 0.0, 0.0, 1.0),
-    )
+class Look_At_Transform:
+    position: vec3 = (0.0, 0.0, 0.0)
+    look_at: vec3 = (0.0, 0.0, 1.0)
+    up: vec3 = (0.0, 1.0, 0.0)
 
-Transform = Local_Transform | Matrix_Transform
+Transform = Local_Transform | Look_At_Transform

@@ -4,8 +4,8 @@ from .spectrum import *
 from typing import cast
 import sys
 
-textures: list[compo.json] = []
-materials: list[compo.json] = []
+textures: dict[str, compo.json] = {}
+materials: dict[str, compo.json] = {}
 
 def import_texture(json, path: str, spectype: str = '', iscolor=True, isvector=False) -> str:
     type = '' if not isinstance(json, dict) or 'type' not in json else json['type']
@@ -32,11 +32,11 @@ def import_texture(json, path: str, spectype: str = '', iscolor=True, isvector=F
             else:
                 print('only accept scalar for non-color spectrum texture')
                 sys.exit(1)
-            spectra.append(compo.json(
+            spectra[spec_path] = compo.json(
                 entity=spec_path,
                 type='spectrum',
                 serialized=spec,
-            ))
+            )
             tex = compo.Constant_Spectrum_Texture(
                 spectrum=spec_path,
             )
@@ -61,21 +61,28 @@ def import_texture(json, path: str, spectype: str = '', iscolor=True, isvector=F
         print(json)
         sys.exit(1)
 
-    textures.append(compo.json(
+    textures[tex_path] = compo.json(
         entity=tex_path,
         type='texture',
         serialized=tex,
-    ))
+    )
     return tex_path
 
-def import_material(json):
+def import_material(json, index: int=0) -> str:
+    if isinstance(json, str):
+        mat_path = '/material/' + json
+        return mat_path
+    elif 'name' in json:
+        name = json['name']
+    else:
+        name = str(index)
+    mat_path = '/material/' + name
     type = json['type']
-    name = json['name']
-    material_path = '/materials/' + name
+
     if type == 'lambert':
         albedo = import_texture(json['albedo'], name + '/reflectance', spectype='albedo', iscolor=True)
-        materials.append(compo.json(
-            entity=material_path,
+        materials[mat_path] = compo.json(
+            entity=mat_path,
             type='material',
             serialized=compo.Material(
                 bsdf=compo.Lambertian_Bsdf(),
@@ -84,12 +91,12 @@ def import_material(json):
                 },
                 vector_textures={},
             ),
-        ))
-    elif type == 'dieletric' or type == 'rough_dielectric':
+        )
+    elif type == 'dielectric' or type == 'rough_dielectric':
         eta = import_texture(json['ior'], name + '/eta', spectype='unbounded')
         alpha = import_texture(json['roughness'] if 'roughness' in json else 0.001, name + '/alpha', isvector=True)
-        materials.append(compo.json(
-            entity=material_path,
+        materials[mat_path] = compo.json(
+            entity=mat_path,
             type='material',
             serialized=compo.Material(
                 bsdf=compo.Microfacet_Bsdf(),
@@ -100,7 +107,7 @@ def import_material(json):
                     'alpha': alpha,
                 },
             ),
-        ))
+        )
     elif type == 'conductor' or type == 'rough_conductor':
         if 'material' in json:
             eta = '/spectrum/eta/' + json['material']
@@ -109,8 +116,8 @@ def import_material(json):
             eta = import_texture(json['eta'], name + '/eta', spectype='unbounded', iscolor=False)
             k = import_texture(json['k'], name + '/k', spectype='unbounded', iscolor=False)
         alpha = import_texture(json['roughness'] if 'roughness' in json else 0.001, name + '/alpha', isvector=True)
-        materials.append(compo.json(
-            entity=material_path,
+        materials[mat_path] = compo.json(
+            entity=mat_path,
             type='material',
             serialized=compo.Material(
                 bsdf=compo.Microfacet_Bsdf(),
@@ -122,4 +129,5 @@ def import_material(json):
                     'alpha': alpha,
                 },
             ),
-        ))
+        )
+    return mat_path

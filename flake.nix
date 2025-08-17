@@ -58,7 +58,7 @@
         }
       );
 
-      python = mapSystems (system: pkgs.${system}.python312);
+      python = mapSystems (system: pkgs.${system}.python311);
 
       pythonSet = mapSystems (
         system:

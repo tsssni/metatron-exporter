@@ -3,8 +3,8 @@ from .transform import *
 from ..metatron import compo
 import sys
 
-media: list[compo.json] = []
-medium_instances: list[compo.json] = []
+media: dict[str, compo.json] = {}
+medium_instances: dict[str, compo.json] = {}
 
 def import_phase(json) -> compo.Phase_Function:
     if json['type'] == 'isotropic':
@@ -15,7 +15,9 @@ def import_phase(json) -> compo.Phase_Function:
         print(f"{json['type']} phase function not supported")
         sys.exit(1)
 
-def import_medium(json):
+def import_medium(json) -> str:
+    instance_path = '/hierarchy/medium/' + json['name']
+
     sigma_a = import_spectrum(json['sigma_a'], 'unbounded')
     sigma_s = import_spectrum(json['sigma_s'], 'unbounded')
     sigma_e = import_spectrum([0,0,0], 'illuminant')
@@ -24,26 +26,27 @@ def import_medium(json):
     sigma_s_path = '/spectrum/' + json['name'] + '/sigma-s'
     sigma_e_path = '/spectrum/' + json['name'] + '/sigma-e'
 
-    spectra.append(compo.json(
+    spectra[sigma_a_path] = compo.json(
         entity=sigma_a_path,
         type='spectrum',
         serialized=sigma_a,
-    ))
-    spectra.append(compo.json(
+    )
+    spectra[sigma_s_path] = compo.json(
         entity=sigma_s_path,
         type='spectrum',
         serialized=sigma_s,
-    ))
-    spectra.append(compo.json(
+    )
+    spectra[sigma_e_path] = compo.json(
         entity=sigma_e_path,
         type='spectrum',
         serialized=sigma_e,
-    ))
+    )
 
     if json['type'] == 'homogeneous':
         phase = import_phase(json['phase_function'])
-        media.append(compo.json(
-            entity='/medium/' + json['name'],
+        medium_path = '/medium/' + json['name']
+        media[medium_path] = compo.json(
+            entity=medium_path,
             type='medium',
             serialized=compo.Homogeneous_Medium(
                 phase=phase,
@@ -51,20 +54,21 @@ def import_medium(json):
                 sigma_s=sigma_s_path,
                 sigma_e=sigma_e_path,
             ),
-        ))
+        )
     else:
         print(f"{json['type']} medium not supported")
         sys.exit(1)
 
-    medium_instances.append(compo.json(
-        entity='/hierarchy/medium/' + json['name'],
+    medium_instances[instance_path] = compo.json(
+        entity=instance_path,
         type = 'medium_instance',
         serialized=compo.Medium_Instance(
             path='/medium/' + json['name'],
         )
-    ))
-    transforms.append(compo.json(
-        entity='/hierarchy/medium/' + json['name'],
+    )
+    transforms[instance_path] = compo.json(
+        entity=instance_path,
         type = 'transform',
         serialized=compo.Local_Transform(),
-    ))
+    )
+    return instance_path

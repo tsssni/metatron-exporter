@@ -1,7 +1,7 @@
 from ..metatron import compo
 from ..metatron.linalg import *
 
-spectra: list[compo.json] = []
+spectra: dict[str, compo.json] = {}
 
 def import_spectrum(spec: int | float | list[int] | list[float], type: str):
     return compo.Rgb_Spectrum(

@@ -8,9 +8,4 @@ dependencies = []
 
 [tool.pyright]
 autoImportCompletions = false
-reportAny = false
-reportMissingParameterType = false
-reportUnknownArgumentType = false
-reportUnknownParameterType = false
-reportUnknownVariableType = false
-reportUnusedCallResult = false
+typeCheckingMode = "basic"

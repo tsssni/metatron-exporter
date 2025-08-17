@@ -25,8 +25,11 @@ def export() -> list[compo.json]:
             l = l + list(d.values())
         return l
     return to_list([
-        transforms, spectra,
+        transforms,
+        spectra,
         shapes, shape_instances,
         media, medium_instances,
-        lights, textures, materials,
+        lights,
+        textures, materials,
+        dividers,
     ])

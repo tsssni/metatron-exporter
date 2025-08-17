@@ -15,9 +15,7 @@ def import_phase(json) -> compo.Phase_Function:
         print(f"{json['type']} phase function not supported")
         sys.exit(1)
 
-def import_medium(json) -> str:
-    instance_path = '/hierarchy/medium/' + json['name']
-
+def import_medium(json):
     sigma_a = import_spectrum(json['sigma_a'], 'unbounded')
     sigma_s = import_spectrum(json['sigma_s'], 'unbounded')
     sigma_e = import_spectrum([0,0,0], 'illuminant')
@@ -59,6 +57,7 @@ def import_medium(json) -> str:
         print(f"{json['type']} medium not supported")
         sys.exit(1)
 
+    instance_path = '/hierarchy/medium/' + json['name']
     medium_instances[instance_path] = compo.json(
         entity=instance_path,
         type = 'medium_instance',
@@ -71,4 +70,3 @@ def import_medium(json) -> str:
         type = 'transform',
         serialized=compo.Local_Transform(),
     )
-    return instance_path

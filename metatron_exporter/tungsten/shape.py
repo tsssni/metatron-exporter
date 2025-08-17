@@ -8,30 +8,26 @@ import copy
 index: int = 0
 shapes: dict[str, compo.json] = {}
 shape_instances: dict[str, compo.json] = {}
+dividers: dict[str, compo.json] = {}
 
 def import_shape(json):
     global index
     type = json['type']
-    if 'bsdf' not in json:
-        material = compo.Material(
-            bsdf=compo.Lambertian_Bsdf(), spectrum_textures={}, vector_textures={}
-        ) 
-    else:
-        material = cast(compo.Material, materials[import_material(json['bsdf'], index)].serialized)
+    if 'bsdf' in json:
+        mat_path = import_material(json['bsdf'], index)
 
-    if 'emission' in json or 'power' in json:
+    if ('emission' in json or 'power' in json) and type != 'infinite_sphere':
         emission = json['emission' if 'emission' in json else 'power']
-        material = copy.deepcopy(material)
+        material = copy.deepcopy(cast(compo.Material, materials[mat_path].serialized))
         material.spectrum_textures['emission'] = import_texture(
             emission, str(index) + '/emission', spectype='illuminant'
         )
         mat_path = '/material/' + str(index)
-        if type != 'infinite_sphere':
-            materials[mat_path] = compo.json(
-                entity=mat_path,
-                type='material',
-                serialized=material,
-            )
+        materials[mat_path] = compo.json(
+            entity=mat_path,
+            type='material',
+            serialized=material,
+        )
 
     if type == 'infinite_sphere':
         instance_path = '/hierarchy/light/' + str(index)
@@ -65,6 +61,22 @@ def import_shape(json):
             serialized=compo.Shape_Instance(
                 path = shape_path,
             ),
+        )
+
+        div = compo.Divider(
+            shape=instance_path,
+            material=mat_path,
+        )
+        if 'int_medium' in json:
+            div.int_medium = '/hierarchy/medium/' + json['int_medium']
+        if 'ext_medium' in json:
+            div.ext_medium = '/hierarchy/medium/' + json['ext_medium']
+
+        div_path = '/divider/' + str(index)
+        dividers[div_path] = compo.json(
+            entity=div_path,
+            type='divider',
+            serialized=div,
         )
 
     import_transform(json['transform'], instance_path)

@@ -6,12 +6,12 @@ from .light import *
 from .shape import *
 from .camera import *
 from .. import metatron
-from ..metatron import compo
+from ..metatron import compo, shared
 import json
 
 
 def export() -> list[compo.json]:
-    with open(metatron.scene_dir + 'scene.json', 'r') as f:
+    with open(shared.scene_dir + 'scene.json', 'r') as f:
         scene = json.load(f)
     for m in scene['media']:
         import_medium(m)
@@ -31,8 +31,8 @@ def export() -> list[compo.json]:
         spectra,
         shapes, shape_instances,
         media, medium_instances,
-        lights,
         textures, materials,
         dividers,
+        lights,
         cameras, tracers,
     ])

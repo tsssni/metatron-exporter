@@ -1,8 +1,11 @@
-from ..metatron import compo
+from ..metatron import compo, shared
 from ..metatron.linalg import *
 from .spectrum import *
 from typing import cast
 import sys
+import os
+import re
+import shutil
 
 textures: dict[str, compo.json] = {}
 materials: dict[str, compo.json] = {}
@@ -41,14 +44,17 @@ def import_texture(json, path: str, spectype: str = '', iscolor=True, isvector=F
                 spectrum=spec_path,
             )
     elif isinstance(json, str) or type == 'bitmap':
-        path = json if isinstance(json, str) else json['file']
+        input_path = json if isinstance(json, str) else json['file']
+        output_path = re.sub(r'textures', 'texture', input_path)
+        os.makedirs(shared.output_dir + 'texture', exist_ok=True)
+        shutil.copy(shared.scene_dir + input_path, shared.output_dir + 'texture/')
         if isvector:
             tex = compo.Image_Vector_Texture(
-                path=path,
+                path=output_path,
             )
         else:
             tex = compo.Image_Spectrum_Texture(
-                path=path,
+                path=output_path,
                 type=spectype,
             )
     elif type == 'checker':

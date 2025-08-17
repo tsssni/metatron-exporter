@@ -44,6 +44,9 @@ def import_shape(json):
                 env_map='/texture/' + str(index) + '/emission',
             ),
         )
+        import_transform(json['transform'], instance_path)
+        index = index + 1
+        return
     else:
         instance_path = '/hierarchy/shape/' + str(index)
 
@@ -57,37 +60,36 @@ def import_shape(json):
             path = output_path,
         )
     else:
-        shape = compo.Sphere()
+        return
     shapes[shape_path] = compo.json(
         entity=shape_path,
         type='shape',
         serialized=shape,
     )
 
-    if type != 'infinite_sphere':
-        shape_instances[instance_path] = compo.json(
-            entity=instance_path,
-            type='shape_instance',
-            serialized=compo.Shape_Instance(
-                path = shape_path,
-            ),
-        )
+    shape_instances[instance_path] = compo.json(
+        entity=instance_path,
+        type='shape_instance',
+        serialized=compo.Shape_Instance(
+            path = shape_path,
+        ),
+    )
 
-        div = compo.Divider(
-            shape=instance_path,
-            material=mat_path,
-        )
-        if 'int_medium' in json:
-            div.int_medium = '/hierarchy/medium/' + json['int_medium']
-        if 'ext_medium' in json:
-            div.ext_medium = '/hierarchy/medium/' + json['ext_medium']
+    div = compo.Divider(
+        shape=instance_path,
+        material=mat_path,
+    )
+    if 'int_medium' in json:
+        div.int_medium = '/hierarchy/medium/' + json['int_medium']
+    if 'ext_medium' in json:
+        div.ext_medium = '/hierarchy/medium/' + json['ext_medium']
 
-        div_path = '/divider/' + str(index)
-        dividers[div_path] = compo.json(
-            entity=div_path,
-            type='divider',
-            serialized=div,
-        )
+    div_path = '/divider/' + str(index)
+    dividers[div_path] = compo.json(
+        entity=div_path,
+        type='divider',
+        serialized=div,
+    )
 
     import_transform(json['transform'], instance_path)
     index = index + 1

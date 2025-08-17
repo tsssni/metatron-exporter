@@ -1,9 +1,10 @@
 from .transform import *
 from .spectrum import *
-from .shape import *
 from .medium import *
-from .light import *
 from .material import *
+from .light import *
+from .shape import *
+from .camera import *
 from .. import metatron
 from ..metatron import compo
 import json
@@ -18,6 +19,7 @@ def export() -> list[compo.json]:
         import_material(b)
     for s in scene['primitives']:
         import_shape(s)
+    import_camera(scene)
 
     def to_list(ds: list[dict[str, compo.json]]) -> list[compo.json]:
         l: list[compo.json] = []
@@ -32,4 +34,5 @@ def export() -> list[compo.json]:
         lights,
         textures, materials,
         dividers,
+        cameras, tracers,
     ])

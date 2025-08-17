@@ -22,4 +22,4 @@ Component = (
 class json:
     entity: str
     type: str
-    serialized: Component
+    serialized: Component | dict

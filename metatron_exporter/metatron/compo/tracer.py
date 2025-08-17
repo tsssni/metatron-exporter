@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class Divider:
@@ -20,10 +20,10 @@ class LBVH:
 Acceleration = LBVH
 
 @dataclass
-class Volume_Path_Integration:
+class Volume_Path_Integrator:
     volume_path_integration: int = 0
 
-Integrator = Volume_Path_Integration
+Integrator = Volume_Path_Integrator
 
 @dataclass
 class Tracer:

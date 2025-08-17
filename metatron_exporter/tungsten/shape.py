@@ -1,7 +1,7 @@
-from metatron_exporter.tungsten.transform import import_transform
 from ..metatron import compo
 from .material import import_material, materials, import_texture
 from .light import lights
+from .transform import import_transform
 from typing import cast
 import copy
 

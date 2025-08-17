@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from ..linalg import *
 
 @dataclass
@@ -53,5 +53,5 @@ class Camera:
     lens: Lens
     sampler: Sampler
     filter: Filter
-    initial_medium: str = "/hierarchy/medium/vaccum"
-    color_space: str = "/color-space/sRGB"
+    initial_medium: str
+    color_space: str

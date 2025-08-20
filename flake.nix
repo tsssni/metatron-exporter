@@ -84,44 +84,41 @@
         default = virtualenv.${system};
       });
 
-      devShells = mapSystems (
-        system:
-        {
-          impure = pkgs.${system}.mkShell {
-            packages = [
-              python.${system}
-              pkgs.${system}.uv
-            ];
-            env = {
-              UV_PYTHON_DOWNLOADS = "never";
-              UV_PYTHON = python.${system}.interpreter;
-            }
-            // lib.optionalAttrs pkgs.${system}.stdenv.isLinux {
-              LD_LIBRARY_PATH = lib.makeLibraryPath pkgs.${system}.pythonManylinuxPackages.manylinux1;
-            };
-            shellHook = ''
-              unset PYTHONPATH
-            '';
+      devShells = mapSystems (system: {
+        impure = pkgs.${system}.mkShell {
+          packages = [
+            python.${system}
+            pkgs.${system}.uv
+          ];
+          env = {
+            UV_PYTHON_DOWNLOADS = "never";
+            UV_PYTHON = python.${system}.interpreter;
+          }
+          // lib.optionalAttrs pkgs.${system}.stdenv.isLinux {
+            LD_LIBRARY_PATH = lib.makeLibraryPath pkgs.${system}.pythonManylinuxPackages.manylinux1;
+          };
+          shellHook = ''
+            unset PYTHONPATH
+          '';
+        };
+
+        default = pkgs.${system}.mkShell {
+          packages = [
+            virtualenv.${system}
+            pkgs.${system}.uv
+          ];
+
+          env = {
+            UV_NO_SYNC = "1";
+            UV_PYTHON = python.${system}.interpreter;
+            UV_PYTHON_DOWNLOADS = "never";
           };
 
-          uv2nix = pkgs.${system}.mkShell {
-            packages = [
-              virtualenv.${system}
-              pkgs.${system}.uv
-            ];
-
-            env = {
-              UV_NO_SYNC = "1";
-              UV_PYTHON = python.${system}.interpreter;
-              UV_PYTHON_DOWNLOADS = "never";
-            };
-
-            shellHook = ''
-              unset PYTHONPATH
-              export REPO_ROOT=$(git rev-parse --show-toplevel)
-            '';
-          };
-        }
-      );
+          shellHook = ''
+            unset PYTHONPATH
+            export REPO_ROOT=$(git rev-parse --show-toplevel)
+          '';
+        };
+      });
     };
 }

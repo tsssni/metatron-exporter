@@ -5,7 +5,9 @@ cameras: dict[str, compo.json] = {
     '/hierarchy/camera': compo.json(
         entity='/hierarchy/camera',
         type='camera',
-        serialized={},
+        serialized={
+            "spp": 1,
+        },
     ),
 }
 

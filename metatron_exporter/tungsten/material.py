@@ -26,7 +26,7 @@ def import_texture(json, path: str, spectype: str = '', iscolor=True, isvector=F
                 spec = compo.Rgb_Spectrum(
                     c = to_vec3(json),
                     type = spectype,
-                    color_space='/spectrum/color_space/sRGB',
+                    color_space='/color-space/sRGB',
                 )
             elif not isinstance(json, list):
                 spec = compo.Constant_Spectrum(
@@ -116,8 +116,8 @@ def import_material(json, index: int=0) -> str:
         )
     elif type == 'conductor' or type == 'rough_conductor':
         if 'material' in json:
-            eta = '/spectrum/eta/' + json['material']
-            k = '/spectrum/k/' + json['material']
+            eta = '/texture/eta/' + json['material']
+            k = '/texture/k/' + json['material']
         else:
             eta = import_texture(json['eta'], name + '/eta', spectype='unbounded', iscolor=False)
             k = import_texture(json['k'], name + '/k', spectype='unbounded', iscolor=False)
@@ -136,4 +136,18 @@ def import_material(json, index: int=0) -> str:
                 },
             ),
         )
+    else:
+        albedo = import_texture([1.0, 1.0, 1.0], name + '/reflectance', spectype='albedo', iscolor=True)
+        materials[mat_path] = compo.json(
+            entity=mat_path,
+            type='material',
+            serialized=compo.Material(
+                bsdf=compo.Lambertian_Bsdf(),
+                spectrum_textures={
+                    'reflectance': albedo,
+                },
+                vector_textures={},
+            ),
+        )
+
     return mat_path

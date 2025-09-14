@@ -5,14 +5,10 @@ class Interface_Bsdf:
     interface: int = 0
 
 @dataclass
-class Lambertian_Bsdf:
-    lambertian: int = 0
+class Physical_Bsdf:
+    physical: int = 0
 
-@dataclass
-class Microfacet_Bsdf:
-    microfacet: int = 0
-
-Bsdf = Interface_Bsdf | Lambertian_Bsdf | Microfacet_Bsdf
+Bsdf = Interface_Bsdf | Physical_Bsdf
 
 @dataclass
 class Material:

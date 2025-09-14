@@ -3,7 +3,7 @@ from ..metatron.linalg import *
 
 transforms: dict[str, compo.json] = {}
 
-def import_transform(json, path: str, extra_rot: vec4 = (0, 0, 0, 1)):
+def import_transform(json, path: str):
     t = compo.Local_Transform()
     if 'position' in json:
         # left hand z face inside
@@ -16,7 +16,7 @@ def import_transform(json, path: str, extra_rot: vec4 = (0, 0, 0, 1)):
         # left hand x/y rotation is reversed
         rotation = json['rotation']
         rotation[0], rotation[1], rotation[2] = -rotation[0], -rotation[1], rotation[2]
-        t.rotation = quat_mul(euler_yxz_to_quat(to_vec3(rotation)), extra_rot)
+        t.rotation = euler_yxz_to_quat(to_vec3(rotation))
     if 'look_at' in json and 'up' in json:
         look_at = json['look_at']
         up = json['up']

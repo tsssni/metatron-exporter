@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from ..linalg import *
 
 @dataclass
 class Parallel_Light:
@@ -22,4 +23,12 @@ class Environment_Light:
     env_map: str
     environment: int = 0
 
-Light = Parallel_Light | Point_Light | Spot_Light | Environment_Light
+@dataclass
+class Sunsky_Light:
+    direction: vec2
+    turbidity: float
+    albedo: float
+    aperture: float
+    sunsky: int = 0
+
+Light = Parallel_Light | Point_Light | Spot_Light | Environment_Light | Sunsky_Light

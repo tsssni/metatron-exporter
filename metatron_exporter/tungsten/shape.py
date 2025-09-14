@@ -1,7 +1,8 @@
 from ..metatron import compo, shared
-from .material import import_material, materials, import_texture, textures
+from ..metatron.linalg import *
+from .material import import_material, materials, import_texture
 from .light import lights
-from .transform import import_transform
+from .transform import import_transform, transforms
 from typing import cast
 import math
 import copy
@@ -15,19 +16,14 @@ dividers: dict[str, compo.json] = {}
 
 def import_shape(json):
     global index
+    light_types = ('infinite_sphere', 'infinite_sphere_cap', 'skydome')
     type = json['type']
     if 'bsdf' in json:
         mat_path = import_material(json['bsdf'], index)
 
-    if type == 'skydome':
-        json['emission'] = [0.03, 0.07, 0.23]
-        type = 'infinite_sphere'
-
-    if 'power' in json:
+    if type != 'infinite_sphere_cap' and 'power' in json:
         if type == 'infinite_sphere':
             emission_scale = 1 / (4 * math.pi)
-        elif type == 'infinite_sphere_cap':
-            emission_scale = 1 / (2 * math.pi * (1 - math.cos(json['cap_angle'])))
         else:
             emission_scale = 0
         json['emission'] = json['power'] * emission_scale
@@ -38,9 +34,7 @@ def import_shape(json):
             str(index) + '/emission',
             spectype='illuminant',
         )
-        if type == 'infinite_sphere_cap':
-            textures.pop('/texture/' + str(index) + '/emission')
-        elif type != 'infinite_sphere':
+        if type not in light_types:
             material = copy.deepcopy(cast(compo.Material, materials[mat_path].serialized))
             material.spectrum_textures['emission'] = emission
             mat_path = '/material/' + str(index)
@@ -63,16 +57,62 @@ def import_shape(json):
         index = index + 1
         return
     elif type == 'infinite_sphere_cap':
-        instance_path = '/hierarchy/light/' + str(index)
-        lights[instance_path] = compo.json(
-            entity=instance_path,
-            type='light',
-            serialized=compo.Parallel_Light(
-                spectrum='/spectrum/' + str(index) + '/emission',
-            ),
-        )
-        import_transform(json['transform'], instance_path, (0.7071, 0, 0, 0.7071))
-        index = index + 1
+        instance_path = '/hierarchy/light/sky'
+        import_transform(json['transform'], instance_path)
+        t = transforms[instance_path].serialized
+
+        d = (0, 0)
+        a = 0
+        if isinstance(t, compo.Local_Transform):
+            q = t.rotation
+            t.rotation = (0, 0, 0, 1)
+            p = quat_mul(quat_mul(q, (0, 1, 0, 0)), quat_conj(q))
+            p = normalize(vec3(p))
+            theta = math.acos(p[1])
+            phi = math.atan2(p[2], p[0])
+            if phi < 0:
+                phi += 2 * math.pi
+            d = (theta, phi)
+        if 'cap_angle' in json:
+            a = math.radians(json['cap_angle'])
+
+        if instance_path in lights:
+            light = lights[instance_path].serialized
+            if isinstance(light, compo.Sunsky_Light):
+                light.direction = d
+                light.aperture = a
+            lights[instance_path].serialized = light
+        else:
+            lights[instance_path] = compo.json(
+                entity=instance_path,
+                type='light',
+                serialized=compo.Sunsky_Light(
+                    direction=d,
+                    turbidity=1,
+                    albedo=0,
+                    aperture=a,
+                ),
+            )
+        return
+    elif type == 'skydome':
+        instance_path = '/hierarchy/light/sky'
+        if instance_path in lights:
+            light = lights[instance_path].serialized
+            if isinstance(light, compo.Sunsky_Light):
+                light.turbidity = json['turbidity']
+                light.albedo = 0.2
+            lights[instance_path].serialized = light
+        else:
+            lights[instance_path] = compo.json(
+                entity=instance_path,
+                type='light',
+                serialized=compo.Sunsky_Light(
+                    direction=(0,0),
+                    turbidity=json['turbidity'],
+                    albedo=0.2,
+                    aperture=0,
+                ),
+            )
         return
     else:
         instance_path = '/hierarchy/shape/' + str(index)

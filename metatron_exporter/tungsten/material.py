@@ -91,7 +91,7 @@ def import_material(json, index: int=0) -> str:
             entity=mat_path,
             type='material',
             serialized=compo.Material(
-                bsdf=compo.Lambertian_Bsdf(),
+                bsdf=compo.Physical_Bsdf(),
                 spectrum_textures={
                     'reflectance': albedo,
                 },
@@ -105,7 +105,7 @@ def import_material(json, index: int=0) -> str:
             entity=mat_path,
             type='material',
             serialized=compo.Material(
-                bsdf=compo.Microfacet_Bsdf(),
+                bsdf=compo.Physical_Bsdf(),
                 spectrum_textures={
                     'eta': eta,
                 },
@@ -126,7 +126,7 @@ def import_material(json, index: int=0) -> str:
             entity=mat_path,
             type='material',
             serialized=compo.Material(
-                bsdf=compo.Microfacet_Bsdf(),
+                bsdf=compo.Physical_Bsdf(),
                 spectrum_textures={
                     'eta': eta,
                     'k': k,
@@ -136,13 +136,31 @@ def import_material(json, index: int=0) -> str:
                 },
             ),
         )
-    else:
-        albedo = import_texture([1.0, 1.0, 1.0], name + '/reflectance', spectype='albedo', iscolor=True)
+    elif type == 'plastic' or type == 'rough_plastic':
+        albedo = import_texture(json['albedo'], name + '/reflectance', spectype='albedo', iscolor=True)
+        eta = import_texture(json['ior'], name + '/eta', iscolor=False)
+        alpha = import_texture(json['roughness'] if 'roughness' in json else 0.001, name + '/alpha', isvector=True)
         materials[mat_path] = compo.json(
             entity=mat_path,
             type='material',
             serialized=compo.Material(
-                bsdf=compo.Lambertian_Bsdf(),
+                bsdf=compo.Physical_Bsdf(),
+                spectrum_textures={
+                    'reflectance': albedo,
+                    'eta': eta,
+                },
+                vector_textures={
+                    'alpha': alpha,
+                },
+            ),
+        )
+    else:
+        albedo = import_texture(json['albedo'], name + '/reflectance', spectype='albedo', iscolor=True)
+        materials[mat_path] = compo.json(
+            entity=mat_path,
+            type='material',
+            serialized=compo.Material(
+                bsdf=compo.Physical_Bsdf(),
                 spectrum_textures={
                     'reflectance': albedo,
                 },

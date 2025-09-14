@@ -69,6 +69,9 @@ def quat_mul(q0: vec4, q1: vec4) -> vec4:
         w * rw - x * rx - y * ry - z * rz,
     )
 
+def quat_conj(q: vec4) -> vec4:
+    return (-q[0], -q[1], -q[2], q[3])
+
 def euler_yxz_to_quat(euler: vec3) -> vec4:
     hx, hy, hz = (math.radians(euler[i]) * 0.5 for i in range(3))
     qx = (math.sin(hx), 0.0, 0.0, math.cos(hx))

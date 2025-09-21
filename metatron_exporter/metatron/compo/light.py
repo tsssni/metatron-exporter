@@ -29,6 +29,8 @@ class Sunsky_Light:
     turbidity: float
     albedo: float
     aperture: float
+    temperature: float
+    intensity: float
     sunsky: int = 0
 
 Light = Parallel_Light | Point_Light | Spot_Light | Environment_Light | Sunsky_Light

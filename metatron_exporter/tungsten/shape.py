@@ -61,36 +61,38 @@ def import_shape(json):
         import_transform(json['transform'], instance_path)
         t = transforms[instance_path].serialized
 
-        d = (0, 0)
-        a = 0
+        direction = (0, 0)
+        aperture = 0
         if isinstance(t, compo.Local_Transform):
-            q = t.rotation
+            rotation = t.rotation
             t.rotation = (0, 0, 0, 1)
-            p = quat_mul(quat_mul(q, (0, 1, 0, 0)), quat_conj(q))
-            p = normalize(vec3(p))
-            theta = math.acos(p[1])
-            phi = math.atan2(p[2], p[0])
+            position = quat_mul(quat_mul(rotation, (0, 1, 0, 0)), quat_conj(rotation))
+            position = normalize(vec3(position))
+            theta = math.acos(position[1])
+            phi = math.atan2(position[2], position[0])
             if phi < 0:
                 phi += 2 * math.pi
-            d = (theta, phi)
+            direction = (theta, phi)
         if 'cap_angle' in json:
-            a = math.radians(json['cap_angle'])
+            aperture = math.radians(json['cap_angle']) * 2
 
         if instance_path in lights:
             light = lights[instance_path].serialized
             if isinstance(light, compo.Sunsky_Light):
-                light.direction = d
-                light.aperture = a
+                light.direction = direction
+                light.aperture = aperture
             lights[instance_path].serialized = light
         else:
             lights[instance_path] = compo.json(
                 entity=instance_path,
                 type='light',
                 serialized=compo.Sunsky_Light(
-                    direction=d,
+                    direction=direction,
                     turbidity=1,
                     albedo=0,
-                    aperture=a,
+                    aperture=aperture,
+                    temperature=6504,
+                    intensity=1,
                 ),
             )
         return
@@ -101,6 +103,8 @@ def import_shape(json):
             if isinstance(light, compo.Sunsky_Light):
                 light.turbidity = json['turbidity']
                 light.albedo = 0.2
+                light.temperature = json['temperature']
+                light.intensity = json['intensity']
             lights[instance_path].serialized = light
         else:
             lights[instance_path] = compo.json(
@@ -111,6 +115,8 @@ def import_shape(json):
                     turbidity=json['turbidity'],
                     albedo=0.2,
                     aperture=0,
+                    temperature=json['temperature'],
+                    intensity=json['intensity'],
                 ),
             )
         return

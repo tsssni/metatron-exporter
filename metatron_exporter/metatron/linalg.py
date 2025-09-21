@@ -77,4 +77,4 @@ def euler_yxz_to_quat(euler: vec3) -> vec4:
     qx = (math.sin(hx), 0.0, 0.0, math.cos(hx))
     qy = (0.0, math.sin(hy), 0.0, math.cos(hy))
     qz = (0.0, 0.0, math.sin(hz), math.cos(hz))
-    return quat_mul(quat_mul(qy, qx), qz)
+    return quat_mul(qz, quat_mul(qx, qy))

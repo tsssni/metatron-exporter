@@ -1,8 +1,8 @@
 from metatron_exporter.metatron import shared
+from metatron_exporter.metatron.format import compress, MetatronJSONEncoder
 from dataclasses import asdict
 import os
 import argparse
-import json
 import importlib
 
 def path_norm(path: str):
@@ -23,8 +23,13 @@ def main():
 
     renderer = importlib.import_module(f'metatron_exporter.{args.renderer}')
     scene = renderer.export()
+
+    # Convert to dict and apply formatting rules
+    scene_data = [asdict(item) for item in scene]
+    processed_data = compress(scene_data)
+
     with open(shared.output_dir + 'scene.json', 'w') as f:
-        json.dump([asdict(item) for item in scene], f, indent=4)
+        f.write(MetatronJSONEncoder().encode(processed_data))
 
 
 if __name__ == '__main__':

@@ -10,7 +10,7 @@ import shutil
 textures: dict[str, compo.json] = {}
 materials: dict[str, compo.json] = {}
 
-def import_texture(json, path: str, spectype: str = '', iscolor=True, isvector=False) -> str:
+def import_texture(json, path: str, spectype: str = '', iscolor=True, isvector=False, isenv=False) -> str:
     type = '' if not isinstance(json, dict) or 'type' not in json else json['type']
     spec_path = '/spectrum/' + path
     tex_path = '/texture/' + path
@@ -57,10 +57,33 @@ def import_texture(json, path: str, spectype: str = '', iscolor=True, isvector=F
                 path=output_path,
                 type=spectype,
             )
+            if spectype == 'illuminant':
+                tex.distr = 'spherical' if isenv else 'uniform'
     elif type == 'checker':
-        # not supported yet
-        tex = compo.Constant_Spectrum_Texture(
-            spectrum='/spectrum/one',
+        x = compo.Rgb_Spectrum(
+            c = to_vec3(json['on_color']),
+            type = spectype,
+            color_space='/color-space/sRGB',
+        )
+        y = compo.Rgb_Spectrum(
+            c = to_vec3(json['off_color']),
+            type = spectype,
+            color_space='/color-space/sRGB',
+        )
+        spectra[spec_path + '/x'] = compo.json(
+            entity=spec_path + '/x',
+            type='spectrum',
+            serialized=x,
+        );
+        spectra[spec_path + '/y'] = compo.json(
+            entity=spec_path + '/y',
+            type='spectrum',
+            serialized=y,
+        );
+        tex = compo.Checkerboard_Texture(
+            x=spec_path + '/x',
+            y=spec_path + '/y',
+            uv_scale=to_vec2([json['res_u'], json['res_v']]),
         )
     else:
         print(f'{type} texture not supported')

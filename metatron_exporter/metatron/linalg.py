@@ -1,6 +1,5 @@
 from typing import cast
 import math
-import sys
 
 vec2 = tuple[float, float]
 vec3 = tuple[float, float, float]

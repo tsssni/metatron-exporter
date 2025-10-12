@@ -10,7 +10,15 @@ class Constant_Spectrum_Texture:
 class Image_Spectrum_Texture:
     path: str
     type: str
+    distr: str = 'none'
     image_spectrum: int = 0
+
+@dataclass
+class Checkerboard_Texture:
+    x: str
+    y: str
+    uv_scale: vec2
+    checkerboard: int = 0
 
 @dataclass
 class Constant_Vector_Texture:
@@ -22,4 +30,4 @@ class Image_Vector_Texture:
     path: str
     image_vector: int = 0
 
-Texture = Constant_Spectrum_Texture | Image_Spectrum_Texture | Constant_Vector_Texture | Image_Vector_Texture
+Texture = Constant_Spectrum_Texture | Image_Spectrum_Texture | Checkerboard_Texture | Constant_Vector_Texture | Image_Vector_Texture

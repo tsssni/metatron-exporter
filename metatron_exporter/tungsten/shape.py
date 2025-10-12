@@ -33,6 +33,7 @@ def import_shape(json):
             json['emission'],
             str(index) + '/emission',
             spectype='illuminant',
+            isenv=type=='infinite_sphere'
         )
         if type not in light_types:
             material = copy.deepcopy(cast(compo.Material, materials[mat_path].serialized))

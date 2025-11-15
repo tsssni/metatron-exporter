@@ -9,6 +9,8 @@ def compress(data, is_top_level: bool = True):
     elif isinstance(data, dict):
         result = {}
         for key, value in data.items():
+            if isinstance(value, str) and value == '':
+                continue
             if key in ("int_medium", "ext_medium") and value == "/hierarchy/medium/vaccum":
                 continue
             result[key] = compress(value, False)

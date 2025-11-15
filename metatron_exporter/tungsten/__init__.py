@@ -1,11 +1,8 @@
 from .transform import *
-from .spectrum import *
 from .medium import *
-from .material import *
-from .light import *
-from .shape import *
-from .camera import *
-from .. import metatron
+from .bsdf import *
+from .primitive import *
+from .renderer import *
 from ..metatron import compo, shared
 import json
 
@@ -16,10 +13,10 @@ def export() -> list[compo.json]:
     for m in scene['media']:
         import_medium(m)
     for b in scene['bsdfs']:
-        import_material(b)
+        import_bsdf(b)
     for s in scene['primitives']:
-        import_shape(s)
-    import_camera(scene)
+        import_primitve(s)
+    renderer = import_renderer(scene)
 
     def to_list(ds: list[dict[str, compo.json]]) -> list[compo.json]:
         l: list[compo.json] = []
@@ -29,10 +26,10 @@ def export() -> list[compo.json]:
     return to_list([
         transforms,
         spectra,
-        shapes, shape_instances,
-        media, medium_instances,
-        textures, materials,
+        shapes,
+        media,
+        textures,
+        materials,
         dividers,
         lights,
-        cameras, tracers,
-    ])
+    ]) + [renderer]

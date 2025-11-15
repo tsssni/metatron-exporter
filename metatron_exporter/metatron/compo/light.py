@@ -3,25 +3,21 @@ from ..linalg import *
 
 @dataclass
 class Parallel_Light:
-    spectrum: str
-    parallel: int = 0
+    L: str
 
 @dataclass
 class Point_Light:
-    spectrum: str
-    parallel: int = 0
+    L: str
 
 @dataclass
 class Spot_Light:
-    spectrum: str
+    L: str
     falloff_start_theta: float
     falloff_end_theta: float
-    parallel: int = 0
 
 @dataclass
 class Environment_Light:
     env_map: str
-    environment: int = 0
 
 @dataclass
 class Sunsky_Light:
@@ -31,6 +27,5 @@ class Sunsky_Light:
     aperture: float
     temperature: float
     intensity: float
-    sunsky: int = 0
 
 Light = Parallel_Light | Point_Light | Spot_Light | Environment_Light | Sunsky_Light

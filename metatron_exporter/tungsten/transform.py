@@ -30,7 +30,7 @@ def import_transform(json, path: str):
         )
 
     transforms[path] = compo.json(
-        entity=path,
-        type='transform',
-        serialized=t,
+        entity = path,
+        type = type(t).__name__.lower(),
+        serialized = t,
     )

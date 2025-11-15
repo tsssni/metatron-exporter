@@ -1,36 +1,41 @@
 from dataclasses import dataclass
+from ..linalg import *
 
 @dataclass
-class Henyey_Greenstein_Phase_Function:
+class Uniform_Volume:
+    bbox: Bounding_Box
+    dimensions: vec3
+
+@dataclass
+class Nanovdb_Volume:
+    path: str
+
+Volume = Uniform_Volume | Nanovdb_Volume
+
+@dataclass
+class Phase:
+    function: str
     g: float
-    henyey_greenstein: int = 0
-
-Phase_Function = Henyey_Greenstein_Phase_Function
-
-@dataclass
-class Vaccum_Medium:
-    vacuum: int = 0
 
 @dataclass
 class Homogeneous_Medium:
-    phase: Phase_Function
-    sigma_a: str
-    sigma_s: str
-    sigma_e: str
-    homogeneous: int = 0
+    phase: Phase
+    sigma_a: str = ''
+    sigma_s: str = ''
+    sigma_e: str = ''
 
 @dataclass
-class Grid_Medium:
-    path: str
-    phase: Phase_Function
-    sigma_a: str
-    sigma_s: str
-    sigma_e: str
-    density_scale: float
-    grid: int = 0
-
-Medium = Vaccum_Medium | Homogeneous_Medium | Grid_Medium
+class Heterogeneous_Medium:
+    phase: Phase
+    sigma_a: str = ''
+    sigma_s: str = ''
+    sigma_e: str = ''
+    dimensions: vec3 = (0, 0, 0)
+    density: str = ''
+    density_scale: float = 1.0
 
 @dataclass
-class Medium_Instance:
-    path: str
+class Vaccum_Medium:
+    ...
+
+Medium = Homogeneous_Medium | Heterogeneous_Medium | Vaccum_Medium

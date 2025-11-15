@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import cast
 import math
 
@@ -11,6 +12,11 @@ mat4 = tuple[vec4, vec4, vec4, vec4]
 vecable = int | float | list[int] | list[float]
 vec = vec2 | vec3 | vec4
 mat = mat2 | mat3 | mat4
+
+@dataclass
+class Bounding_Box:
+    p_min: vec3
+    p_max: vec3
 
 def isvecable(value):
       return isinstance(value, (int, float)) or (

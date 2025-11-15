@@ -1,72 +1,65 @@
-from .spectrum import *
 from .transform import *
+from .bsdf import spectra
 from ..metatron import compo
 import sys
 
 media: dict[str, compo.json] = {}
-medium_instances: dict[str, compo.json] = {}
 
-def import_phase(json) -> compo.Phase_Function:
-    if json['type'] == 'isotropic':
-        return compo.Henyey_Greenstein_Phase_Function(g=0.0)
-    elif json['type'] == 'henyey_greenstein':
-        return compo.Henyey_Greenstein_Phase_Function(g=json['g'])
+def import_spectrum(spec: int | float | list[int] | list[float], type: str):
+    return compo.Rgb_Spectrum(
+        c = to_vec3(spec),
+        type = type,
+    )
+
+def import_phase(json) -> compo.Phase:
+    type = json['type']
+    if type == 'isotropic':
+        return compo.Phase(function = 'henyey_greenstein', g = 0.0)
+    elif type == 'henyey_greenstein':
+        return compo.Phase(function = 'henyey_greenstein', g = json['g'])
     else:
-        print(f"{json['type']} phase function not supported")
+        print(f"phase function with type {type} not supported")
         sys.exit(1)
 
 def import_medium(json):
+    name = json['name']
+
     sigma_a = import_spectrum(json['sigma_a'], 'unbounded')
     sigma_s = import_spectrum(json['sigma_s'], 'unbounded')
-    sigma_e = import_spectrum([0,0,0], 'illuminant')
-
-    sigma_a_path = '/spectrum/' + json['name'] + '/sigma-a'
-    sigma_s_path = '/spectrum/' + json['name'] + '/sigma-s'
-    sigma_e_path = '/spectrum/' + json['name'] + '/sigma-e'
-
+    sigma_a_path = '/spectrum/' + name + '/sigma-a'
+    sigma_s_path = '/spectrum/' + name + '/sigma-s'
     spectra[sigma_a_path] = compo.json(
-        entity=sigma_a_path,
-        type='spectrum',
-        serialized=sigma_a,
+        entity = sigma_a_path,
+        type = type(sigma_a).__name__.lower(),
+        serialized = sigma_a,
     )
     spectra[sigma_s_path] = compo.json(
-        entity=sigma_s_path,
-        type='spectrum',
-        serialized=sigma_s,
-    )
-    spectra[sigma_e_path] = compo.json(
-        entity=sigma_e_path,
-        type='spectrum',
-        serialized=sigma_e,
+        entity = sigma_s_path,
+        type = type(sigma_s).__name__.lower(),
+        serialized = sigma_s,
     )
 
-    if json['type'] == 'homogeneous':
+    med_type = json['type']
+    if med_type == 'homogeneous':
         phase = import_phase(json['phase_function'])
-        medium_path = '/medium/' + json['name']
+        medium_path = '/medium/' + name
+        medium = compo.Homogeneous_Medium(
+            phase = phase,
+            sigma_a = sigma_a_path,
+            sigma_s = sigma_s_path,
+        )
         media[medium_path] = compo.json(
-            entity=medium_path,
-            type='medium',
-            serialized=compo.Homogeneous_Medium(
-                phase=phase,
-                sigma_a=sigma_a_path,
-                sigma_s=sigma_s_path,
-                sigma_e=sigma_e_path,
-            ),
+            entity = medium_path,
+            type = type(medium).__name__.lower(),
+            serialized = medium,
         )
     else:
-        print(f"{json['type']} medium not supported")
+        print(f"medium with type {type} not supported")
         sys.exit(1)
 
-    instance_path = '/hierarchy/medium/' + json['name']
-    medium_instances[instance_path] = compo.json(
-        entity=instance_path,
-        type = 'medium_instance',
-        serialized=compo.Medium_Instance(
-            path='/medium/' + json['name'],
-        )
-    )
-    transforms[instance_path] = compo.json(
-        entity=instance_path,
-        type = 'transform',
-        serialized=compo.Local_Transform(),
+    transform_path = '/hierarchy/medium/' + json['name']
+    transforms[transform_path] = compo.json(
+        entity = transform_path,
+        type = compo.Local_Transform.__name__.lower(),
+        serialized = compo.Local_Transform(),
     )

@@ -1,22 +1,14 @@
 from dataclasses import dataclass
 
-from .camera import Camera
-from .light import Light
-from .material import Material
-from .medium import Medium, Medium_Instance
-from .shape import Shape, Shape_Instance
-from .spectrum import Spectrum
-from .texture import Texture
-from .tracer import Divider, Tracer
 from .transform import Transform
+from .spectrum import Spectrum
+from .shape import Shape
+from .medium import Volume, Medium
+from .material import Vector_Texture, Spectrum_Texture, Material, Divider
+from .light import Light
+from .renderer import Renderer
 
-Component = (
-    Camera | Light | Material |
-    Medium | Medium_Instance |
-    Shape | Shape_Instance |
-    Spectrum | Texture |
-    Divider | Tracer | Transform
-)
+Component = Transform | Spectrum | Shape | Volume | Medium | Vector_Texture | Spectrum_Texture | Material | Divider | Light | Renderer
 
 @dataclass
 class json:

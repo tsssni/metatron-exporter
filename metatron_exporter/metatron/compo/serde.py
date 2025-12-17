@@ -8,7 +8,20 @@ from .material import Vector_Texture, Spectrum_Texture, Material, Divider
 from .light import Light
 from .renderer import Renderer
 
-Component = Transform | Spectrum | Shape | Volume | Medium | Vector_Texture | Spectrum_Texture | Material | Divider | Light | Renderer
+Component = (
+    Transform
+    | Spectrum
+    | Shape
+    | Volume
+    | Medium
+    | Vector_Texture
+    | Spectrum_Texture
+    | Material
+    | Divider
+    | Light
+    | Renderer
+)
+
 
 @dataclass
 class json:

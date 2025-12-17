@@ -1,13 +1,16 @@
 from dataclasses import dataclass
-from ..linalg import *
+from ..linalg import vec2
+
 
 @dataclass
 class Parallel_Light:
     L: str
 
+
 @dataclass
 class Point_Light:
     L: str
+
 
 @dataclass
 class Spot_Light:
@@ -15,9 +18,11 @@ class Spot_Light:
     falloff_start_theta: float
     falloff_end_theta: float
 
+
 @dataclass
 class Environment_Light:
     env_map: str
+
 
 @dataclass
 class Sunsky_Light:
@@ -27,5 +32,6 @@ class Sunsky_Light:
     aperture: float
     temperature: float
     intensity: float
+
 
 Light = Parallel_Light | Point_Light | Spot_Light | Environment_Light | Sunsky_Light

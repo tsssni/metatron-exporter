@@ -50,75 +50,44 @@
       };
 
       pyprojectOverrides = _final: _prev: { };
-
-      pkgs = mapSystems (
+    in
+    {
+      devShells = mapSystems (
         system:
-        import nixpkgs {
-          inherit system;
-        }
-      );
-
-      python = mapSystems (system: pkgs.${system}.python311);
-
-      pythonSet = mapSystems (
-        system:
-        (pkgs.${system}.callPackage pyproject-nix.build.packages {
-          python = python.${system};
-        }).overrideScope
-          (
+        let
+          pkgs = import nixpkgs { inherit system; };
+          python = pkgs.python311;
+          pythonSet = (pkgs.callPackage pyproject-nix.build.packages { inherit python; }).overrideScope (
             lib.composeManyExtensions [
               pyproject-build-systems.overlays.default
               overlay
               pyprojectOverrides
             ]
-          )
-      );
+          );
+          venv = pythonSet.mkVirtualEnv "metatron-exporter-venv" workspace.deps.default;
+        in
+        {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              venv
+              uv
+              ruff
+              ty
+            ];
 
-      virtualenv = mapSystems (
-        system: pythonSet.${system}.mkVirtualEnv "metatron-exporter-venv" workspace.deps.default
-      );
+            env = {
+              UV_NO_SYNC = "1";
+              UV_PYTHON = python.interpreter;
+              UV_PYTHON_DOWNLOADS = "never";
+            };
 
-    in
-    {
-      packages = mapSystems (system: {
-        default = virtualenv.${system};
-      });
-
-      devShells = mapSystems (system: {
-        impure = pkgs.${system}.mkShell {
-          packages = [
-            python.${system}
-            pkgs.${system}.uv
-          ];
-          env = {
-            UV_PYTHON_DOWNLOADS = "never";
-            UV_PYTHON = python.${system}.interpreter;
-          }
-          // lib.optionalAttrs pkgs.${system}.stdenv.isLinux {
-            LD_LIBRARY_PATH = lib.makeLibraryPath pkgs.${system}.pythonManylinuxPackages.manylinux1;
+            shellHook = ''
+              unset PYTHONPATH
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+              export SHELL=nu
+            '';
           };
-          shellHook = ''
-            unset PYTHONPATH
-          '';
-        };
-
-        default = pkgs.${system}.mkShell {
-          packages = [
-            virtualenv.${system}
-            pkgs.${system}.uv
-          ];
-
-          env = {
-            UV_NO_SYNC = "1";
-            UV_PYTHON = python.${system}.interpreter;
-            UV_PYTHON_DOWNLOADS = "never";
-          };
-
-          shellHook = ''
-            unset PYTHONPATH
-            export REPO_ROOT=$(git rev-parse --show-toplevel)
-          '';
-        };
-      });
+        }
+      );
     };
 }

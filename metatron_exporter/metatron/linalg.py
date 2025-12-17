@@ -13,17 +13,20 @@ vecable = int | float | list[int] | list[float]
 vec = vec2 | vec3 | vec4
 mat = mat2 | mat3 | mat4
 
+
 @dataclass
 class Bounding_Box:
     p_min: vec3
     p_max: vec3
 
+
 def isvecable(value):
-      return isinstance(value, (int, float)) or (
-          isinstance(value, list) and
-          len(value) > 0 and
-          all(isinstance(x, (int, float)) for x in value)
-      )
+    return isinstance(value, (int, float)) or (
+        isinstance(value, list)
+        and len(value) > 0
+        and all(isinstance(x, (int, float)) for x in value)
+    )
+
 
 def to_list(x: vecable, n: int) -> list[float]:
     if not isinstance(x, list):
@@ -31,31 +34,39 @@ def to_list(x: vecable, n: int) -> list[float]:
     else:
         return [float(y) for y in x]
 
+
 def to_vec(x: vecable, n: int = 1):
     if isinstance(x, list):
         n = len(x)
     return tuple(to_list(x, n))
 
+
 def to_vec2(x: vecable) -> vec2:
     return cast(vec2, to_vec(x, 2))
+
 
 def to_vec3(x: vecable) -> vec3:
     return cast(vec3, to_vec(x, 3))
 
+
 def to_vec4(x: vecable) -> vec4:
     return cast(vec4, to_vec(x, 4))
+
 
 def plus(x, y):
     n = len(x)
     return to_vec([x[i] + y[i] for i in range(n)])
 
+
 def minus(x, y):
     n = len(x)
     return to_vec([x[i] - y[i] for i in range(n)])
 
+
 def normalize(x):
-    l = sum([s**2 for s in x])
-    return to_vec([s / l for s in x]) if l > 0.0 else x
+    d = sum([s**2 for s in x])
+    return to_vec([s / d for s in x]) if d > 0.0 else x
+
 
 def cross(x, y):
     return (
@@ -63,6 +74,7 @@ def cross(x, y):
         x[2] * y[0] - x[0] * y[2],
         x[0] * y[1] - x[1] * y[0],
     )
+
 
 def quat_mul(q0: vec4, q1: vec4) -> vec4:
     x, y, z, w = q0
@@ -74,8 +86,10 @@ def quat_mul(q0: vec4, q1: vec4) -> vec4:
         w * rw - x * rx - y * ry - z * rz,
     )
 
+
 def quat_conj(q: vec4) -> vec4:
     return (-q[0], -q[1], -q[2], q[3])
+
 
 def euler_yxz_to_quat(euler: vec3) -> vec4:
     hx, hy, hz = (math.radians(euler[i]) * 0.5 for i in range(3))

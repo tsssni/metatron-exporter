@@ -8,13 +8,13 @@ import json
 
 
 def export() -> list[compo.json]:
-    with open(shared.scene_dir + 'scene.json', 'r') as f:
+    with open(shared.scene_dir + "scene.json", "r") as f:
         scene = json.load(f)
-    for m in scene['media']:
+    for m in scene["media"]:
         import_medium(m)
-    for b in scene['bsdfs']:
+    for b in scene["bsdfs"]:
         import_bsdf(b)
-    for s in scene['primitives']:
+    for s in scene["primitives"]:
         import_primitve(s)
     renderer = import_renderer(scene)
 
@@ -23,13 +23,16 @@ def export() -> list[compo.json]:
         for d in ds:
             l = l + list(d.values())
         return l
-    return to_list([
-        transforms,
-        spectra,
-        shapes,
-        media,
-        textures,
-        materials,
-        dividers,
-        lights,
-    ]) + [renderer]
+
+    return to_list(
+        [
+            transforms,
+            spectra,
+            shapes,
+            media,
+            textures,
+            materials,
+            dividers,
+            lights,
+        ]
+    ) + [renderer]

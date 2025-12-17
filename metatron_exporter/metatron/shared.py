@@ -1,2 +1,2 @@
-scene_dir = './'
-output_dir = './result/'
+scene_dir = "./"
+output_dir = "./result/"

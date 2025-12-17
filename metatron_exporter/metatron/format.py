@@ -1,5 +1,6 @@
 import json
 
+
 def compress(data, is_top_level: bool = True):
     if isinstance(data, list):
         if is_top_level:
@@ -9,9 +10,12 @@ def compress(data, is_top_level: bool = True):
     elif isinstance(data, dict):
         result = {}
         for key, value in data.items():
-            if isinstance(value, str) and value == '':
+            if isinstance(value, str) and value == "":
                 continue
-            if key in ("int_medium", "ext_medium") and value == "/hierarchy/medium/vaccum":
+            if (
+                key in ("int_medium", "ext_medium")
+                and value == "/hierarchy/medium/vaccum"
+            ):
                 continue
             result[key] = compress(value, False)
         return result
@@ -50,9 +54,9 @@ class MetatronJSONEncoder(json.JSONEncoder):
             return self._encode_dict(obj, indent_level)
         elif isinstance(obj, list):
             if len(obj) > 1:
-                return json.dumps(obj, separators=(', ', ': '))
+                return json.dumps(obj, separators=(", ", ": "))
             else:
-                return json.dumps(obj, separators=(',', ': '))
+                return json.dumps(obj, separators=(",", ": "))
         else:
             return json.dumps(obj)
 

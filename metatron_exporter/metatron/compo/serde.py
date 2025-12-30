@@ -6,7 +6,6 @@ from .shape import Shape
 from .medium import Volume, Medium
 from .material import Vector_Texture, Spectrum_Texture, Material, Divider
 from .light import Light
-from .renderer import Renderer
 
 Component = (
     Transform
@@ -19,7 +18,6 @@ Component = (
     | Material
     | Divider
     | Light
-    | Renderer
 )
 
 
